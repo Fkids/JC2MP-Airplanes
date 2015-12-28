@@ -1,6 +1,6 @@
-class "cAirplanes"
+class "sAirplanes"
 
-function cAirplanes:__init()
+function sAirplanes:__init()
 	self:initVars()
 	self:initPool()
 	Events:Subscribe("ModuleLoad", self, self.onModuleLoad)
@@ -9,7 +9,7 @@ function cAirplanes:__init()
 	Network:Subscribe("01", self, self.onVehicleCollide)
 end
 
-function cAirplanes:initVars()
+function sAirplanes:initVars()
 	self.vehicles = {}
 	self.count = 256 -- planes
 	self.delay = 2 -- seconds
@@ -18,7 +18,7 @@ function cAirplanes:initVars()
 	self.div2 = self.delay / self.count
 end
 
-function cAirplanes:initPool()
+function sAirplanes:initPool()
 	self.pool = { 39, 51, 59, 59, 81 }
 	-- 1x Aeroliner 474 [39]
 	-- 1x Cassius 192 [51]
@@ -27,7 +27,7 @@ function cAirplanes:initPool()
 end
 
 -- Events
-function cAirplanes:onModuleLoad()
+function sAirplanes:onModuleLoad()
 	for vehicleId = 1, self.count do
 		self:createVehicle()
 	end
@@ -42,14 +42,14 @@ function cAirplanes:onModuleLoad()
 	Events:Subscribe("PostTick", self, self.onPostTick)
 end
 
-function cAirplanes:onModuleUnload()
+function sAirplanes:onModuleUnload()
 	self.unloading = true
 	for _, data in pairs(self.vehicles) do
 		self:removeVehicle(data)
 	end
 end
 
-function cAirplanes:onPostTick(args)
+function sAirplanes:onPostTick(args)
 	local amount = math.floor(math.min(args.delta * self.div1, self.count))
 	if amount < 1 then
 		if self.timer:GetSeconds() < self.div2 then return end
@@ -62,7 +62,7 @@ function cAirplanes:onPostTick(args)
 	end
 end
 
-function cAirplanes:onEntityDespawn(args)
+function sAirplanes:onEntityDespawn(args)
 	if self.unloading then return end
 	if args.entity.__type ~= "Vehicle" then return end
 	local vehicleId = args.entity:GetId() + 1
@@ -72,7 +72,7 @@ function cAirplanes:onEntityDespawn(args)
 end
 
 -- Network
-function cAirplanes:onVehicleCollide(args)
+function sAirplanes:onVehicleCollide(args)
 	local vehicleId = args[1]
 	if not self.vehicles[vehicleId] then return end
 	local vehicle = Vehicle.GetById(vehicleId - 1)
@@ -90,7 +90,7 @@ function cAirplanes:onVehicleCollide(args)
 end
 
 -- Custom
-function cAirplanes:createVehicle()
+function sAirplanes:createVehicle()
 	local yaw = math.random(-math.pi, math.pi)
 	local vehicle = Vehicle.Create
 	({
@@ -104,7 +104,7 @@ function cAirplanes:createVehicle()
 	self.vehicles[vehicleId] = { vehicle, Timer() }
 end
 
-function cAirplanes:updateVehicle(data, position, angle, modelId)
+function sAirplanes:updateVehicle(data, position, angle, modelId)
 	local vehicle = data[1]
 	if not IsValid(vehicle) then return end
 	local position = self:wrapPosition(vehicle:GetPosition())
@@ -118,13 +118,13 @@ function cAirplanes:updateVehicle(data, position, angle, modelId)
 	end
 end
 
-function cAirplanes:removeVehicle(data)
+function sAirplanes:removeVehicle(data)
 	local vehicle = data[1]
 	if not IsValid(vehicle) then return end
 	vehicle:Remove()
 end
 
-function cAirplanes:wrapPosition(position)
+function sAirplanes:wrapPosition(position)
 	if math.abs(position.x) > 16384 then
 		position.x = -position.x
 		return position
@@ -136,4 +136,4 @@ function cAirplanes:wrapPosition(position)
 	return position
 end
 
-cAirplanes = cAirplanes()
+sAirplanes = sAirplanes()

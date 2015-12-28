@@ -1,6 +1,6 @@
-class "sAirplanes"
+class "cAirplanes"
 
-function sAirplanes:__init()
+function cAirplanes:__init()
 	self:initVars()
 	Events:Subscribe("ModuleUnload", self, self.onModuleUnload)
 	Events:Subscribe("PostTick", self, self.onPostTick)
@@ -12,26 +12,26 @@ function sAirplanes:__init()
 	Network:Subscribe("01", self, self.onVehicleUpdate)
 end
 
-function sAirplanes:initVars()
+function cAirplanes:initVars()
 	self.vehicles = {}
 	self.actors = {}
 	self.delay = 5 -- seconds
 end
 
 -- Events
-function sAirplanes:onModuleUnload()
+function cAirplanes:onModuleUnload()
 	for _, actor in pairs(self.actors) do
 		actor:Remove()
 	end
 end
 
-function sAirplanes:onPostTick()
+function cAirplanes:onPostTick()
 	for _, data in pairs(self.vehicles) do
 		self:updateVehicle(data)
 	end
 end
 
-function sAirplanes:onRender()
+function cAirplanes:onRender()
 	-- Debug
 	for _, data in pairs(self.vehicles) do
 		local vehicle = data[1]
@@ -47,7 +47,7 @@ function sAirplanes:onRender()
 	end
 end
 
-function sAirplanes:onLocalPlayerInput(args)
+function cAirplanes:onLocalPlayerInput(args)
 	if args.input ~= Action.UseItem then return end
 	local vehicle = LocalPlayer:GetVehicle()
 	if not IsValid(vehicle) then return end
@@ -55,7 +55,7 @@ function sAirplanes:onLocalPlayerInput(args)
 	if self.vehicles[vehicleId] then return false end
 end
 
-function sAirplanes:onVehicleCollide(args)
+function cAirplanes:onVehicleCollide(args)
 	if args.entity.__type ~= "Vehicle" then return end
 	local vehicleId = args.entity:GetId() + 1
 	local data = self.vehicles[vehicleId]
@@ -69,7 +69,7 @@ function sAirplanes:onVehicleCollide(args)
 	Network:Send("01", { vehicleId, position })
 end
 
-function sAirplanes:onEntitySpawn(args)
+function cAirplanes:onEntitySpawn(args)
 	if args.entity.__type ~= "Vehicle" then return end
 	local vehicle = args.entity
 	if not vehicle:GetValue("AI") then return end
@@ -77,7 +77,7 @@ function sAirplanes:onEntitySpawn(args)
 	self.vehicles[vehicleId] = self:addVehicle(vehicle)
 end
 
-function sAirplanes:onEntityDespawn(args)
+function cAirplanes:onEntityDespawn(args)
 	if args.entity.__type ~= "Vehicle" then return end
 	local vehicleId = args.entity:GetId() + 1
 	if not self.vehicles[vehicleId] then return end
@@ -87,14 +87,14 @@ function sAirplanes:onEntityDespawn(args)
 end
 
 -- Network
-function sAirplanes:onVehicleUpdate(args)
+function cAirplanes:onVehicleUpdate(args)
 	local vehicleId = args[1]
 	if not self.vehicles[vehicleId] then return end
 	self.vehicles[vehicleId][5] = args[2]
 end
 
 -- Custom
-function sAirplanes:addVehicle(vehicle)
+function cAirplanes:addVehicle(vehicle)
 	local vehicleId = vehicle:GetId() + 1
 	local position = vehicle:GetPosition()
 	local yaw = vehicle:GetValue("AI")
@@ -113,7 +113,7 @@ function sAirplanes:addVehicle(vehicle)
 	return { vehicle, Timer(), yaw, Timer() }
 end
 
-function sAirplanes:updateVehicle(data)
+function cAirplanes:updateVehicle(data)
 	local vehicle = data[1]
 	if not IsValid(vehicle) then return end
 	if vehicle:GetHealth() < 0.3 then
@@ -149,7 +149,7 @@ function sAirplanes:updateVehicle(data)
 	actor:SetInput(Action.PlaneDecTrust, math.max(-speed, 0))
 end
 
-function sAirplanes:getFlightHeight(position, angle)
+function cAirplanes:getFlightHeight(position, angle)
 	local height = 200
 	local movement = angle * Vector3.Forward
 	for amount = 5, 400, 20 do
@@ -158,4 +158,4 @@ function sAirplanes:getFlightHeight(position, angle)
 	return height + 200
 end
 
-sAirplanes = sAirplanes()
+cAirplanes = cAirplanes()
