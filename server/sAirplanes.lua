@@ -126,11 +126,11 @@ end
 
 function sAirplanes:wrapPosition(position)
 	if math.abs(position.x) > 16384 then
-		position.x = -position.x
+		position.x = math.clamp(-position.x, -16000, 16000)
 		return position
 	end
 	if math.abs(position.z) > 16384 then
-		position.z = -position.z
+		position.z = math.clamp(-position.z, -16000, 16000)
 		return position
 	end
 	return position
